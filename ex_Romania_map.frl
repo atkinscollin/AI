@@ -1,0 +1,98 @@
+((from Oradea Zerind 14))
+((from Oradea Sibiu 14.5))
+((from Zerind Arad 15))
+((from Arad Sibiu 15.5))
+((from Arad Timisoara 13))
+((from Sibiu Fagaras 14))
+((from Sibiu RimnicuV 11))
+((from RimnicuV Craiova 10))
+((from Pitesti Craiova 13))
+((from RimnicuV Pitesti 10))
+((from Pitesti Bucharest 8))
+((from Timisoara Lugoj 13))
+((from Lugoj Mehadia 11.5))
+((from Mehadia Dobreta 13))
+((from Dobreta Craiova 13))
+((from Bucharest Giurgiu 12))
+((from Urziceni Bucharest 13))
+((from Urziceni Hirsova 13))
+((from Hirsova Eforie 13.5))
+((from Vaslui Urziceni 13))
+((from Iasi Vaslui 10))
+((from Neamt Vaslui 10))
+
+/* connect with cost */
+((connect X Y C)(from X Y C))
+((connect X Y C)(from Y X C))
+
+/* connect without cost */
+((connect X Y)(from X Y _))
+
+
+% ((path X Y) (from X Y _))
+% ((path X Y)(from Y X _))
+
+
+
+
+((sdl Bucharest 0 ))
+((sdl Craiova 160 ))
+((sdl Dobreta 242 ))
+((sdl Eforie 161 ))
+((sdl Fagaras 176 ))
+((sdl Giurigiu 77 ))
+((sdl Hirshova 151 ))
+((sdl Iasi 226 )) 
+((sdl Lugoj 244 ))
+((sdl Pitesti 100 ))
+((sdl RimnicuV 193 ))
+((sdl Sibiu 253 ))
+((sdl Timisoara 329 ))
+((sdl Urziceni 80 ))
+((sdl Vaslui 199 ))
+((sdl Zerind 374 ))
+((sdl Mehadia 241 ))
+((sdl Neamt 234 ))
+((sdl Oradea 380 ))
+((sdl Arad 366))
+
+((hValue C HC)(sdl C HC))
+
+
+
+
+((generate_random 0 _ () ))
+((generate_random N MAG (R|T))
+	(random RR)(times RR MAG R)
+	(sum N -1 N1)(generate_random N1 MAG T))
+
+((all_cities C)
+	(findall X ((connect X _)) L)
+	(findall Y ((connect _ Y)) LY)(append L LY LL)
+	(rem_dup LL C))
+
+((generate_h () () ()))
+((generate_h H)
+	(all_cities C)(length C LC)
+	(generate_random LC 100 G)
+	(generate_h_help   C G H))
+
+((generate_h_help () () () ))
+((generate_h_help (C|CT) (G |GT) ((C G)|T))(generate_h_help CT GT T))
+
+
+((h_values H)(generate_h H)(addcl ((h_values H)) ))
+
+
+((hValue X XV)(h_values H)(!)(member (X XV) H))
+
+
+
+
+
+
+
+
+
+
+

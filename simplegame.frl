@@ -1,0 +1,50 @@
+
+
+/* this is the simple minimax example from Russell and Norvig 
+Figure 5.2 page 126 in the 1st edition; example 6.2 page 164 in the 2nd edition
+*/
+
+((path a b))
+((path a c))
+((path a d))
+
+((path b e))
+((path b f))
+((path b g))
+
+((path c h))
+((path c i))
+((path c j))
+
+((path d k))
+((path d l))
+((path d m))
+
+((staticvalue e 3))
+((staticvalue f 12))
+((staticvalue g 8))
+((staticvalue h 2))
+((staticvalue i 4))
+((staticvalue j 6))
+((staticvalue k 14))
+((staticvalue l 5))
+((staticvalue m 2))
+
+((moves P L)(findall X ((path P X)) L))
+
+((min_to_move b))
+((min_to_move c))
+((min_to_move d))
+
+((max_to_move a))
+((max_to_move e))
+((max_to_move f))
+((max_to_move g))
+((max_to_move h))
+((max_to_move i))
+((max_to_move j))
+((max_to_move k))
+((max_to_move l))
+((max_to_move m))
+
+

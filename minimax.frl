@@ -1,0 +1,47 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.78 [en] (X11; U; SunOS 5.8 sun4m) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EE" vlink="#551A8B" alink="#FF0000">
+/* (minimax POS BEST VAL) holds if BEST is the best successor in the minimax
+tree and VAL is the corresponding value */
+<p>% stopping condition
+<p><b><font color="#3333FF">((minimax POS _ VAL) (staticvalue POS VAL))</font></b>
+<p><b><font color="#3333FF">((minimax P BEST VAL)</font></b>
+<br><b><font color="#3333FF">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (moves P PL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></b><i><font color="#000000">% find all the successors of P</font></i>
+<br><b><font color="#3333FF">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (!) (best
+PL BEST VAL))&nbsp;&nbsp;&nbsp;&nbsp; </font></b><i>% find the best successor</i>
+<p><font color="#3333FF"><b>((best (POS) POS VAL)&nbsp;</b><i> </i></font><i>%
+the best out of a list with one element</i>
+<br>&nbsp;<b><font color="#3333FF">&nbsp; (minimax POS _ VAL)(!))</font></b>
+<p>% best from a list with more than one element
+<p><b><font color="#3333FF">((best (P1 | PList) BESTP BESTV)</font></b>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><font color="#3333FF">&nbsp;&nbsp;
+(minimax P1 _ V1)&nbsp;&nbsp;&nbsp;</font></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+% find the minimax value for the head of the list
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b><font color="#3333FF">(best
+PList P2 V2)&nbsp;</font></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+% find the best from the tail
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><font color="#3333FF">
+(better_of P1 V1 P2 V2 BESTP BESTV))</font></b>&nbsp;&nbsp;&nbsp;&nbsp;
+% select that which is better
+<p>/* (better_of P1 V1 P2 V2 P V) succeeds when P V is the better of P1
+V1 and P2 V2 */
+<p>% if P1 is a "min to move" P2 is better if V2 is less then V1
+<br><b><font color="#3333FF">((better_of P1 V1 P2 V2 P1 V1)</font></b>
+<br><b><font color="#3333FF">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(min_to_move P1)</font></b>
+<br><b><font color="#3333FF">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(less V2 V1)(!))</font></b>
+<p>% if P1 is a "max to move" P2 is better if V1 is less then V2
+<br><b><font color="#3333FF">((better_of P1 V1 P2 V2 P1 V1)</font></b>
+<br><b><font color="#3333FF">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(max_to_move P1)</font></b>
+<br><b><font color="#3333FF">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(less V1 V2)(!))</font></b>
+<p><b><font color="#3333FF">((better_of P1 V1 P2 V2 P2 V2))</font></b>
+</body>
+</html>

@@ -1,0 +1,88 @@
+/* The  stopping rule for this condition is obtained when 
+the current path to be expanded starts with the goal node, that is:
+*/
+
+((breadthF ((X |T) |  PATHS) (X|T))
+               (goal X))
+
+
+
+
+((breadthF (PAth | TPaths) SOL)
+           (expand PAth  NPaths)
+           (append TPaths NPaths NEWPATHS)
+           (breadthF NEWPATHS SOL))
+ 
+
+
+
+
+/*
+The predicate expand is similar to solve_all_wfa from which we will 
+remove the predicates operating on the knowledge base and replace go by 
+path.  That is, from the predicate
+*/
+
+((solve_all_wfa S G SOLUTIONS)
+                        (kill goal)
+                        (addcl ((goal G)) )
+                        (findall P ((go S P (S)))  SOLUTIONS)
+                        (delcl ((goal G)) ))
+
+%we will obtain:
+
+((expand (HPath|TPath) NPaths)
+            (findall  (NEXT HPath|TPath)
+                       ((path HPath NEXT)(negg member NEXT (HPath|TPath)))
+                         NPaths
+               )% this closes findall
+)
+
+%We next wrap this in a top level predicate  solve_BF as follows:
+
+((solve_BF S  G SOL)
+                 (kill goal)
+                 (addcl ((goal G)))
+                 (breadthF ((S)) S1)
+                 (reverse S1 SOL)
+                 (pretty_print_solution SOL)
+                 (delcl  ((goal G))  ))
+ 
+
+
+/*** graph example ***/
+((connect a b))
+((connect a d))
+((connect a f))
+
+((connect b c))
+((connect b f))
+
+((connect d e))
+((connect f e))
+
+((connect c e))
+
+((path X Y)(connect X Y))
+((path X Y)(connect Y X))
+
+
+/* auxiliary predicates */
+
+((member H (H|_)))
+((member X (H|T))(member X T))
+
+((print ())(p success))
+((print (H | T))
+     (p H ">>>")
+     (pp)(print T)) 
+
+((reverse () ()))
+((reverse (H|T) R)(reverse T RT)(append RT (H) R))
+
+((append () L L))
+((append (H|T) L2 (H|L))(append T L2 L))
+
+
+((pretty_print_solution () ))
+((pretty_print_solution (H|T))(pp)(p H "->")(pretty_print_solution T))

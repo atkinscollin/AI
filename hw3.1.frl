@@ -1,0 +1,70 @@
+% horses, lions, and tigers are mammals
+((mammal X)(horse X))
+((mammal X)(lion X))
+((mammal X)(tiger X))
+((mammal X)
+  (!)(fail))
+
+((horse Charlie))
+((horse X)
+  (!)(fail))
+
+((lion Leo))
+((lion X)
+  (!)(fail))
+
+((tiger Iris))
+((tiger X)
+  (!)(fail))
+
+% X is Y's offspring if Y is X's parent
+((offspring X Y)
+  (parent Y X)
+  (p 'Offspring: ')(pp X)
+  (p 'Parent: ')(pp Y))
+
+% X is Y's parent
+((parent Iris Lola))
+((parent Y X)
+  % Makes sure X isn't a blank term
+  (if (con X)
+    ((pp ))
+    ((!)(fail)))
+  (if (same_type Y X)
+    ((pp ))
+    ((!)(fail)))
+  (if (mammal X)
+    ((pp ))
+    ((!)(fail)))
+  (if (mammal Y)
+    ((pp ))
+    ((!)(fail))))
+((parent Y X)
+  (!)(fail))
+
+((animal X OUT)
+  (if (offspring X Y)
+    ((animal_type Y Z)(addcl ((Z X)) 0))
+    ((pp )))
+  (animal_type X OUT)
+  (p X 'is a' OUT)(pp))
+
+((animal_type X Y)
+  (lion X)
+  (append () lion Y))
+((animal_type X Y)
+  (tiger X)
+  (append () tiger Y))
+((animal_type X Y)
+  (horse X)
+  (append () horse Y))
+
+((same_type X Y)
+  (animal_type X SOLX)
+  (animal_type Y SOLY)
+  (if (eq SOLX SOLY)
+    ((pp 'Same animal type'))
+    ((pp 'Not the same animal type')(!)(fail))))
+
+((append () L L))
+((append (H|T) L2 (H|L))(append T L2 L))

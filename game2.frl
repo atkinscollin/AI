@@ -1,0 +1,103 @@
+/* this is the simple minimax example from Russell and Norvig */
+
+((path a b))
+((path a q))
+
+
+((path b c))
+((path b j))
+
+((path q r))
+((path q z))
+
+((path c d))
+((path c g))
+
+((path j k))
+((path j n))
+
+((path r s))
+((path r v))
+
+((path z z1))
+((path z z4))
+
+((path d e))
+((path d f))
+
+((path g h))
+((path g i))
+
+((path k l))
+((path k m))
+
+((path n o))
+((path n p))
+
+((path s t))
+((path s u))
+
+((path v w))
+((path v x))
+
+((path z1 z2))
+((path z1 z3))
+
+((path z4 z5))
+((path z4 z6))
+
+((staticvalue e 10))
+((staticvalue f 11))
+((staticvalue l 14))
+((staticvalue h 9))
+((staticvalue i 12))
+((staticvalue t 15))
+((staticvalue p 14))
+((staticvalue o 13))
+((staticvalue m 15))
+((staticvalue u 2))
+((staticvalue w 4))
+((staticvalue x 1))
+((staticvalue z2 3))
+((staticvalue z3 22))
+((staticvalue z5 24))
+((staticvalue z6 25))
+
+((moves P L)(findall X ((path P X)) L))
+
+((min_to_move b))
+((min_to_move q))
+((min_to_move d))
+((min_to_move g))
+((min_to_move k))
+((min_to_move n))
+((min_to_move s))
+((min_to_move v))
+((min_to_move z1))
+((min_to_move z4))
+
+((max_to_move a))
+((max_to_move c))
+((max_to_move j))
+((max_to_move r))
+((max_to_move z))
+((max_to_move e))
+
+
+((max_to_move f))
+((max_to_move h))
+((max_to_move i))
+((max_to_move l))
+((max_to_move m))
+((max_to_move o))
+
+((max_to_move p))
+((max_to_move t))
+((max_to_move u))
+((max_to_move w))
+((max_to_move z2))
+((max_to_move x))
+
+((max_to_move z3))
+((max_to_move z5))
+((max_to_move z6))

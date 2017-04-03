@@ -1,0 +1,33 @@
+% horse is a mammal
+((mammal X)(horse X))
+((mammal X)(lion X))
+((mammal X)(tiger X))
+((mammal X)
+  (!)(fail))
+
+((horse Charlie))
+((horse X)(eq 0 1))
+
+((lion Leo))
+((lion X)(eq 0 1))
+
+((tiger Iris))
+((tiger Lola))
+((tiger X)(eq 0 1))
+
+% X is Y's offspring if Y is X's parent
+((offspring X Y)
+  (parent Y X)
+  (p 'Offspring: ')(pp X)
+  (p 'Parent: ')(pp Y))
+
+((parent Iris Lola))
+((parent Y X)
+  (parent X Y)(!)(fail))
+% every mammal has a parent
+((parent _ X)
+  (mammal X))
+
+((animal_type X)(lion X)(p X 'is a lion'))
+((animal_type X)(tiger X)(p X 'is a tiger'))
+((animal_type X)(horse X)(p X 'is a horse'))

@@ -1,0 +1,102 @@
+
+((solution S)
+	(permutation (1 2 3 4 5 6 7 8) S)
+	(safe S))
+
+
+/* the empty board is safe */
+
+((safe () ))
+
+
+/* a list of queens is safely placed if anyone of them 
+does not attack the remaining ones, and these are safely placed
+*/
+((safe (Q | OTHERS))
+    (safe OTHERS)
+    (no_attack Q OTHERS))
+
+((permutation () ()))
+((permutation L (X|P))(mem X L L1)(permutation L1 P)) 
+
+((mem H (H|T) T))
+((mem X (H|T) (H|T1))(mem X T T1))
+
+((no_attack_aux  _ () _))
+
+((no_attack_aux Y (YH | YT) XDIST)
+     (negg sum Y XDIST YH )            /* YH - Y /= XDIST */
+     (negg sum YH  XDIST Y)         /* Y - YH  /= XDIST */
+      (sum 1 XDIST XDIST1 )
+     (no_attack_aux Y YT XDIST1))
+
+
+((no_attack Q OTHERS)
+       (no_attack_aux Q OTHERS 1))
+
+
+/* 3rd version */
+
+((solution3 Q)    
+    (sol Q 
+                (1 2 3 4 5 6 7 8)
+                (1 2 3 4 5 6 7 8)
+                (2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)
+                (-7 -6 -5 -4 -3 -2 -1 0  1  2  3  4  5  6  7)))
+
+
+/* ((sol Q DX DY DU DV)) holds by finding the solution given the domains
+  It is recursive: at each recursive call the  tails of first and second argument are passed
+*/
+
+((sol () () DY DU DV))
+((sol (Q | QL) (X|TX) DY DU DV)             
+        (mem Q DY DY1)        
+         (sum X Q U)
+         (mem  U DU DU1)        
+         (sum V Q X)
+         (mem  V DV DV1)     
+         (sol QL TX DY1 DU1 DV1))
+
+
+
+/* generalizing the program */
+
+/* ((generate N1 N2 L)) holds by generating an (N2-N1+1) x  (N2-N1+1) board */
+
+((generate N N (N))(!))
+((generate N1 N2 (N1 |L))(less N1 N2)(!)(sum N1 1 M1)(generate M1 N2 L))
+((generate N1 N2 L)(generate N2 N1 L))
+
+
+/* gen_sol is like solution (in fact it calls it) except that it generates the board on 
+which the queens are to be placed
+*/
+
+((gen_sol N S)
+    (generate 1 N DXY)
+    (sum V1 N 1)
+    (sum V2 1 N)
+    (generate V1 V2 DV)
+    (sum N N U2)
+     (generate 2 U2 DU)
+     (sol S DXY DXY DU DV))
+
+
+/* Comparing the programs: */
+
+
+((test_query)
+    (pp)(statistics)
+    (findall Q2 ((solution Q2)) L2)(pp "solution 2")(pp)(statistics)
+    (findall Q3 ((solution3 Q3)) L3)(pp "solution 3")(pp)(statistics)
+    (findall Q4 ((gen_sol 8 Q4)) L4)(pp "solution 4")(pp)(statistics))
+
+
+
+((length () 0))
+((length (_|T) L)(length T L1)(sum L1 1 L))
+
+
+((member H (H|_)))
+((member X (H|T))(member X T))

@@ -1,0 +1,59 @@
+/* farmer goes alone */
+((path (F1 W G C) (F2 W G C) )
+       (opp F1 F2)
+       (legal (F2 W G C)  ))
+
+/* the farmer takes the wolf */
+((path (F1 F1 G C) (F2 F2 G C) )
+       (opp F1 F2)
+       (legal (F2 F2 G C)  ))
+
+/* the farmer takes the goat */
+((path (F1 W F1 C) (F2 W F2 C) )
+       (opp F1 F2)
+       (legal (F2 W F2 C)  ))
+
+/* the farmer take the cabbage */
+((path (F1 W G F1) (F2 W G F2) )
+       (opp F1 F2)
+       (legal (F2 W G F2)  ))
+
+
+/* farmer goes alone */
+((path (F1 W G C) (F2 W G C) )
+       (opp F1 F2)
+       (legal (F2 W G C)  ))
+
+/* the farmer takes the wolf */
+((path (F1 F1 G C) (F2 F2 G C) )
+       (opp F1 F2)
+       (legal (F2 F2 G C)  ))
+
+/* the farmer takes the goat */
+((path (F1 W F1 C) (F2 W F2 C) )
+       (opp F1 F2)
+       (legal (F2 W F2 C)  ))
+
+/* the farmer take the cabbage */
+((path (F1 W G F1) (F2 W G F2) )
+       (opp F1 F2)
+       (legal (F2 W G F2)  ))
+
+
+
+
+/* W and G cannot be alone */
+((illegal (F W W C))(opp F W))
+
+/* G and C cannot be alone */
+((illegal (F W G G))(opp F G))
+
+%Legal states:
+
+((legal X)(illegal X)(!)(fail))
+((legal _))
+
+/*  north and south are opposite banks */
+((opp n s))
+((opp s n))
+

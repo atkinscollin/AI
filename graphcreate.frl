@@ -1,0 +1,292 @@
+?((pp)(p "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"))
+?((pp)(p "+ demonstrate lemma generation:                              +"))
+?((pp)(p "+        obtain intermediate results and add them to the KB  +"))
+?((pp)(p "+ Programmed by: Anca Ralescu                                +"))
+?((pp)(p "+ November 13-14, 2011                                       +"))
+?((pp)(p "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"))
+
+% ((nodes L)) lists the nodes, numbered from M to N, M < N of the graph
+((nodes ( 1 2 3 4 5 6 7 8 9 10 ) ))
+
+
+% ((connect_aux X Y M N)) when X < Y are random integers between >= M, <=N
+% it makes use to the user defined predicate randint
+((connect_aux X Y  M N )
+	(randint M N X)
+	(sum X 1 X1)
+	(randint X1 N Y))
+
+
+% ((randint M1 M2 M)) holds when M is a random integere between M1 and M2; M1 <= M2
+% it makes use of the bip ((random  X)) which generates a random vaue X in [0, 1]
+% it uses the formula M = M1 + (M2 - M1)* X
+% it makes use of the bip division which implements integer division; 
+% for example, ?((division 4.123 1 M)) returns M equal to 4
+((randint M1 M2 M)
+	(random X)
+	(sum M1 Y M2)(times X  Y Z)(sum M1 Z M3)
+	(division M3 1 M))
+
+
+% ((connect_aux2 N L)) generates a list of  N pairs (X Y) 
+% where X and Y are random integers in the range 1 - 10 
+% it invokes connect_aux defined above
+((connect_aux2 0 ()))
+
+((connect_aux2 1 ((X Y)) )
+	(connect_aux X Y 1 10))
+
+((connect_aux2 N ((X Y)|L1) )
+	(sum N -1 N1)
+	(connect_aux2 N1 L1)
+	(connect_aux X Y 1 10)
+	(negg member (X Y) L1))
+
+
+
+% ((connect_aux3 N L)) invokes ((connect_aux2 N L)) and defines the predicate ((edges L)) 
+% which is added to the knowledge base 
+% invoke connect_aux3 several times, each time with small values of N
+% For example, if the query ?((connect_aux3 3 L)) is executed 4 times
+% four clauses for the predicate newedges will be added to the knowledge base.
+((connect_aux3 N L)
+	(connect_aux2 N L)
+      (addcl ((newedges L )) ))
+
+
+% alledges_aux collects all the edges from all the clauses for newedges and 
+% eliminates duplicates; it uses set_union defined below in list processing predicates
+% it adds the clause ((alledges EDGES)) where EDGES is the loist of 
+% unique edges collected from  newedges. 
+((alledges_aux)
+	(findall L ((newedges L)) L)(decide L))
+
+((decide ()))
+((decide (H))
+	(addcl ((alledges H)) ))
+((decide (H1 H2|T))
+	(set_union H1 H2 H)
+	(decide (H|T)))
+
+
+
+% ((make PRED L)) will assert in the knowledge base the predicate PRED with the argument
+% being an element of the list L, for ALL the elements of the list L
+% for example, ?((make connect ((1 2) (4 9)) )) will add to the knowledge base
+% the clauses ((connect 1 2)) and ((connect 4 9))
+((make connect ()))
+((make connect ((X Y)|T))
+	(addcl ((connect X Y )) )
+	(make connect T))
+
+((path X Y)(connect X Y))
+((path X Y)(connect Y X))
+
+
+
+% ((outdeg_aux X N)) computes N as the number of nodes Y for which ((connect X Y)) holds;
+% it makes use of the built in predicates findall and length
+((outdeg_aux X N)
+	(findall (X Y) ((connect X Y)) L)(length L N))
+
+((outdeg_aux2 () ))
+((outdeg_aux2 (H|T))(outdeg_aux H N)(addcl ((outdeg H N)) )(outdeg_aux2 T))
+
+
+% ((indeg_aux X N)) computes N as the number of nodes Y for which ((connect Y X)) holds;
+% it makes use of the built in predicates findall and length
+((indeg_aux X N)
+	(findall (X Y) ((connect Y X)) L)(length L N))
+
+((indeg_aux2 () ))
+((indeg_aux2 (H|T))(indeg_aux H N)(addcl ((indeg H N)) )(indeg_aux2 T))
+
+
+% ((deg_aux X N)) computes N as the number of nodes Y for which ((path X Y)) holds;
+% path is the symmetric version of connect
+% it makes use of the built in predicates findall and length
+((deg_aux X N)
+	(findall (X Y) ((path X Y)) L)(length L N))
+
+((deg_aux2 () ))
+((deg_aux2 (H|T))(deg_aux H N)(addcl ((deg H N)) )(deg_aux2 T))
+
+
+%  GENERAL LIST PROCESSING PREDICATES USED IN THE PROGRAM
+((member X (X|_)))
+((member X (_|T))(member X T))
+
+% mem is likemember but removes an element once it finds it in the list
+((mem _ () ()))
+((mem H (H|T) T)(!))
+((mem X (H|T) (H|T1))(mem X T T1))
+
+((length () 0))
+((length (H|T) N)(length T LN)(sum LN 1 N))
+
+((append () L L))
+((append (H1|T1) L2 (H1|T))(append T1 L2 T)) 
+
+((set_union L1 L2 L)(append L1 L2 LL)(rem_dup LL L))
+
+((rem_dup () ()))
+((rem_dup (H|T) (H|TT))(!)(mem H T T1)(rem_dup T1 TT))
+
+/******************   EXAMPLE RUN *************/
+/*
+
+
+Fril: Support Logic Programming System ? Fril Systems Ltd (c) 1988-2002
+          Version 4.982  Created 29-7-2002, 11:00:56
+
+    (Restricted Licence : Research / Educational use only)
+
+Fril >reload gengraph
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++ demonstrate lemma generation:                              +
++        obtain intermediate results and add them to the KB  +
++ Programmed by: Anca Ralescu                                +
++ November 13-14, 2011                                       +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+yes
+Fril >?((nodes N)(pp N))
+(1 2 3 4 5 6 7 8 9 10)
+
+yes
+Fril >% generate random edges
+?((connect_aux3 4 L))
+
+yes
+Fril >?((connect_aux3 4 L))
+
+yes
+Fril >?((connect_aux3 4 L))
+
+yes
+Fril >?((connect_aux3 4 L))
+
+yes
+Fril >?((connect_aux3 4 L))
+
+yes
+Fril >% check the clauses for newedges
+list newedges
+
+((newedges ((7 8) (9 10) (3 7) (5 6))))
+((newedges ((9 10) (3 6) (1 5) (5 6))))
+((newedges ((5 7) (4 9) (6 7) (8 9))))
+((newedges ((7 9) (8 9) (9 10) (6 9))))
+((newedges ((9 10) (4 7) (2 8) (4 6))))
+
+yes
+Fril >/* form the set of unique edges */
+?((alledges_aux))
+
+yes
+Fril >/* check results */
+?((alledges E)(pp E))
+((7 8) (9 10) (3 7) (5 6) (3 6) (1 5) (5 7) (4 9) (6 7) (8 9) (7 9) (6 9) (4 7)
+(2 8) (4 6))
+
+yes
+Fril >/* check number of edges */
+Fril >?((alledges E)(pp E)(length E LE)(pp LE))
+((7 8) (9 10) (3 7) (5 6) (3 6) (1 5) (5 7) (4 9) (6 7) (8 9) (7 9) (6 9) (4 7)
+(2 8) (4 6))
+15
+
+yes
+Fril >/* Note: one duplicate edge was removed */
+list alledges
+
+((alledges ((7 8) (9 10) (3 7) (5 6) (3 6) (1 5) (5 7) (4 9) (6 7) (8 9) (7 9) (
+6 9) (4 7) (2 8) (4 6))))
+
+yes
+Fril >/* to make the connect predicate and add to the knowledge base
+*/
+/* invoke all edges and then make predicate */
+?((alledges E)(make connect E))
+
+yes
+Fril >/* check connect predicate is now in KB */
+list connect
+
+((connect 7 8))
+((connect 9 10))
+((connect 3 7))
+((connect 5 6))
+((connect 3 6))
+((connect 1 5))
+((connect 5 7))
+((connect 4 9))
+((connect 6 7))
+((connect 8 9))
+((connect 7 9))
+((connect 6 9))
+((connect 4 7))
+((connect 2 8))
+((connect 4 6))
+
+yes
+Fril >/* obtain node degrees */
+?((nodes NODES)(outdeg_aux2 NODES))
+
+yes
+Fril >list outdeg
+
+((outdeg 1 1))
+((outdeg 2 1))
+((outdeg 3 2))
+((outdeg 4 3))
+((outdeg 5 2))
+((outdeg 6 2))
+((outdeg 7 2))
+((outdeg 8 1))
+((outdeg 9 1))
+((outdeg 10 0))
+
+yes
+Fril >?((nodes NODES)(indeg_aux2 NODES))
+
+yes
+Fril >list indeg
+
+((indeg 1 0))
+((indeg 2 0))
+((indeg 3 0))
+((indeg 4 0))
+((indeg 5 1))
+((indeg 6 3))
+((indeg 7 4))
+((indeg 8 2))
+((indeg 9 4))
+((indeg 10 1))
+
+yes
+Fril >?((nodes NODES)(deg_aux2 NODES))
+
+yes
+Fril >list deg
+
+((deg 1 1))
+((deg 2 1))
+((deg 3 2))
+((deg 4 3))
+((deg 5 3))
+((deg 6 5))
+((deg 7 6))
+((deg 8 3))
+((deg 9 5))
+((deg 10 1))
+
+yes
+Fril >
+
+*****************************************/
+

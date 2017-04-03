@@ -1,0 +1,28 @@
+((country   Englishman    H)(member H (1 2 3 4 5)))
+((country   Spaniard   H)(member H (1 2 3 4 5)))
+((country    Norwegian   H)(member H (1 2 3 4 5)))
+((country    Japanese   H)(member H (1 2 3 4 5)))
+((country   Ukrainian   H)(member H (1 2 3 4 5)))
+
+((color   Red   H)(member H (1 2 3 4 5) ))
+((color   Blue   H)(member H (1 2 3 4 5) ))
+((color   Yellow   H)(member H (1 2 3 4 5) ))
+((color   Ivory   H)(member H (1 2 3 4 5) ))
+((color   Green   H)(member H (1 2 3 4 5) )
+
+((drink   coffee   H)(member H (1 2 3 4 5) ))
+((drink   tea   H)(member H (1 2 3 4 5) ))
+((drink   orange-juice   H)(member H (1 2 3 4 5) ))
+((drink   milk   H)(member H (1 2 3 4 5) ))
+
+
+((candy   Hershey-bars   H)(member H (1 2 3 4 5) ))
+((candy   Sneakers   H)(member H (1 2 3 4 5) ))
+((candy   Kit-Kats  H)(member H (1 2 3 4 5) ))
+((candy   Smarties   H)(member H (1 2 3 4 5) ))
+((candy   Milky-Way   H)(member H (1 2 3 4 5) ))
+
+((pet   fox   H)(member H (1 2 3 4 5) ))
+((pet   dog   H)(member H (1 2 3 4 5) ))
+((pet   snail   H)(member H (1 2 3 4 5) ))
+((pet   horse   H)(member H (1 2 3 4 5) ))

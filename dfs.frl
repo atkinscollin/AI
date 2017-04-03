@@ -1,0 +1,70 @@
+((go X (X) _ ) 
+       (goal X))
+        
+((go X (X|YPath) L)	 
+        (path X Y)
+        (go Y YPath (Y|L))) 
+
+%called by (plan s g)
+((solve S P L)
+		    (go S P L)
+		    (pp)
+                    (pp 'solution is: ') 
+                    (pretty_print_solution P) 
+                    (get_user_input Y))
+		    
+((solve S P L) 
+                    (print_end)) 
+
+((print_end)(pp 'no more solutions')) 
+
+%gets user input to see if they want to solve for another solution
+((get_user_input Y) 
+		(pp)
+		(p 'more solutions? y or n? ')
+		(r Y) 
+                (eq Y n)) 
+
+((plan S G) 
+             (kill goal)
+	     %adds the clause goal to the knowledge base
+             (addcl ((goal G)) ) 
+	     (solve S P (S) )
+	     %removes the clause goal from the knowledge base
+             (delcl ((goal G)) )
+)
+
+/*** graph example ***/
+((connect a b))
+((connect a d))
+((connect a f))
+
+((connect b c))
+((connect b f))
+
+((connect d e))
+((connect f e))
+
+((connect c e))
+
+((path X Y)(connect X Y))
+((path X Y)(connect Y X))
+
+/* auxiliary predicates */
+
+((member H (H|_)))
+((member X (H|T))(member X T))
+
+((print ())(p success))
+((print (H | T))
+     (p H ">>>")
+     (pp)(print T)) 
+
+((reverse () ()))
+((reverse (H|T) R)(reverse T RT)(append RT (H) R))
+
+((append () L L))
+((append (H|T) L2 (H|L))(append T L2 L))
+
+((pretty_print_solution () ))
+((pretty_print_solution (H|T))(pp)(p H '->')(pretty_print_solution T))

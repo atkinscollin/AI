@@ -1,0 +1,250 @@
+
+%The Englishman lives in the red house.
+%The Spaniard owns the dog.
+%The Norwegian lives in the first house on the left.
+%The green house is immediately to the right of the ivory house.
+%The man who eats Hershey-bars lives in the house next to the man with the fox.
+%Kit-Kats are eaten in the yellow house.
+%The Norwegian lives next to the blue house.
+%The Smarties eater owns snails.
+%The Snickers eater drinks orange juice.
+%The Ukrainian drinks tea.
+%The Japanese eats Milky-Ways.
+%Kit-Kats are eaten in a house next to the house where the horse is kept.
+%Coffee is drunk in the green house.
+%Milk is drunk in the middle house.
+/*
+NATION list:
+  eng, spa,  nor, ukr, jap
+COLOR list:
+  red, green, blue, yellow, ivory
+CANDY list:
+  kitkat, hershey, smarties, snickers, milkyway
+PET list:
+  dog, fox, snail, horse,
+DRINK list
+  milk, coffee, tea, oj,
+
+yellow      blue          red         ivory         green
+--------    --------      -------     ---------     ----------
+norweg      ukranian      english     spaniard      japanese
+water       tea           milk        coffee        oj
+kit-kat     hershey-bar   smarties    snickers      milky-ways
+fox         horse         snails      dog           zebra
+*/
+
+
+/*
+First of all we must choose a representation:
+First Idea:  Introduce a variable/clause for each
+color(5), pet(5), candy(5), drink(5), country(5), for a total of 5 x 5 = 25.
+Each of these will be associated to an integer  i ∊ {1, 2,3 ,4, 5} which denotes
+a house. How do we represent the data/constraints given in the problem?
+
+ ((country COUNTRY  H )) holds when the person from COUNTRY is in house H,
+  where H is in the list (1 2 3 4 5)
+
+This representation is good because we can represent each constraint individually
+by refining these definitions to enforce the constraints described in the
+statement of the problem.  We need to decide how we are going to represent
+something like “ Kit-Kats are eaten in the yellow house” : should we understand
+this as “if Kit-Kats are eaten in a house the color of the house is yellow” or
+“If the color of the house is yellow Kit-Kats are eaten in that house”?
+
+Given the statement of the puzzle (one color per house, one candy per house, etc.),
+in natural language (e.g. English) this is understood as an association, or an
+equivalence,that is “Kit-Kats are eaten in a house IF AND ONLY IF that house is yellow”.
+
+But in FRIL/Prolog clauses we cannot express this kind of knowledge directly (although by the negation by failure we have it expressed implicitly).  I think that the only thing we MUST make sure is to be consistent in how we translate these statements into clauses.
+*/
+
+((country Englishman  H)
+  (member H (1 2 3 4 5))
+  (color Red H))
+((country Spaniard H)
+  (member H (1 2 3 4 5))
+  (pet dog H))
+((country Norwegian 1))
+((country Japanese H)
+  (member H (1 2 3 4 5))
+  (candy Milky-Way H))
+((country Ukrainian H)
+  (member H (1 2 3 4 5)))
+
+((color Red H)
+  (member H (1 2 3 4 5) ))
+((color Blue H)
+  (member H (1 2 3 4 5) )
+  (country Norwegian H2)
+  (next H H2))
+((color Yellow H)
+  (member H (1 2 3 4 5) )
+  (candy Kit-Kats H))
+((color Ivory H)
+  (member H (1 2 3 4 5) ))
+((color Green H)
+  (member H (1 2 3 4 5))
+  (color Ivory H2)
+  (sum H2 1 H))
+
+((drink coffee H)
+  (member H (1 2 3 4 5) )
+  (color Green H))
+((drink tea H)
+  (member H (1 2 3 4 5) )
+  (country Ukrainian H))
+((drink orange-juice H)
+  (member H (1 2 3 4 5) )
+  (candy Snickers  H))
+((drink milk 3))
+((drink wine H)
+  (member H (1 2 3 4 5) ))
+
+((candy Hershey-bars H)
+  (member H (1 2 3 4 5) )
+  (pet fox H1)
+  (next H H1))
+((candy Snickers H)
+  (member H (1 2 3 4 5) )
+  (drink orange-juice H))
+((candy Kit-Kats H)
+  (member H (1 2 3 4 5) )
+  (pet horse H1)
+  (next H H1))
+((candy Smarties H)
+  (member H (1 2 3 4 5) ))
+((candy Milky-Way H)
+  (member H (1 2 3 4 5) ))
+
+((pet fox H)
+  (member H (1 2 3 4 5) ))
+((pet dog H)
+  (member H (1 2 3 4 5) ))
+((pet snail H)
+  (member H (1 2 3 4 5) )
+  (candy Smarties H))
+((pet horse H)
+  (member H (1 2 3 4 5) ))
+((pet zebra H)
+  (member H (1 2 3 4 5) ))
+
+((next H1 H2)(sum H1 1 H2))
+((next H1 H2)(sum H2 1 H1))
+
+/*
+From this point on one need to define a predicate, call it puzzle which will find
+the correct assignment of houses, countries, drinks, etc.
+*/
+
+((puzzle H)
+  (pp H)
+)
+
+
+
+
+
+
+
+
+
+
+
+%%%%=========================== Helper Functions =========================%%%%%%
+
+%takes a list and removes all repeats from it
+((remove_dupes () NEWLIST OUT)(append () NEWLIST OUT))
+((remove_dupes (A|B) NEWLIST OUT)
+    (if (member A B)
+      ( (remove_dupes B NEWLIST OUT) )
+      ( (append NEWLIST (A) TEMPLIST) (remove_dupes B TEMPLIST OUT))
+    )
+
+)
+
+%call with total as 0
+%takes a list of ints and returns the combined total of those, e.g. (1 2 3) returns 6
+((total_list () TOTAL OUT)(sum TOTAL 0 OUT))
+((total_list (X|Y) TOTAL OUT) (sum TOTAL X NEWTOTAL) (total_list Y NEWTOTAL OUT))
+
+%return length of list
+((len () 0))
+((len (X|Y) C)(len Y C1)(sum C1 1 C))
+
+%return list wtih last item in list removed
+((pop_last (X) X))
+((pop_last (X|Y) Z) (pop_last Y Z) )
+
+%return list with first item removed
+((pop (X|Y))(Y))
+((pop (X|Y) Z) (append () Y Z))
+
+%return first item in list
+((get_front (X|Y) Z) (append () X Z))
+
+% Probably named poorly but just checks if list's ((X|Y)) first element is FIRST and last element is LAST
+((path_exists FIRST LAST (X|Y) )
+  (if (first_member FIRST X)
+    ((if (last_member LAST X)
+      ((pp)(p "first:" FIRST ", last:"LAST ", "X " .")(pp)(eq 1 1))
+      ((eq 0 1))
+    ))
+    ((eq 0 1))
+  )
+)
+
+((depth LIST OUT)
+  (if (pop LIST TEMP)
+    ((pop_last LIST LAST) (len LAST OUT))
+    ((pop_last ((LIST)) LAST) (len LAST OUT))
+  )
+)
+
+%first item in a list = X? return true or false
+((first_member X (Y|Z))
+  (eq X Y)
+)
+
+% get last item in a list
+((last_member X (X)))
+((last_member X (Y|Z))
+  (last_member X Z)
+)
+
+%does list contain item X?
+((member X (X|Y) ))
+((member X (Y|Z))
+  (member X Z)
+)
+
+%addition to leess than. Does not work correclty with findall, not sure why
+((greater X Y) (less Y X))
+((greater_eq X Y) (less_eq Y X))
+
+% does list contain item X?
+((member H (H|_)))
+((member X (H|T))
+  (member X T)
+)
+
+((print ())(p success))
+((print (H | T))
+  (p H ">>>")
+  (pp)(print T)
+)
+
+((print_end)
+  (pp 'No more solutions')
+)
+
+((reverse () ()))
+((reverse (H|T) R)(reverse T RT)(append RT (H) R))
+
+((append () L L))
+((append (H|T) L2 (H|L))(append T L2 L))
+
+((pretty_print_solution () ))
+((pretty_print_solution (H|T))
+  (p H '->')
+  (pretty_print_solution T)
+)

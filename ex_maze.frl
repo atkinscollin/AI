@@ -1,0 +1,18 @@
+((connects a b 3))
+((connects a h 2))
+((connects b g 7))
+((connects h g 1))
+((connects b e 1))
+((connects e f 5))
+((connects f i 3))
+((connects b c 9))
+((connects c d 1))
+
+/* new connections in the maze from page 4-7 */
+
+((connects d e 2))
+((connects d i 3))
+
+
+((path X Y)(connects X Y _))
+((path X Y)(connects Y X _))

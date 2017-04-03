@@ -1,0 +1,341 @@
+% Created by group: Collin Atkins and Ryan Tackett
+% Assignment 1: Hybrid Search
+
+% === Hybrid Search ===
+% Finds the optimal path using both depth first search and breadth first search.
+
+% Top level predicate
+% To call:
+%    ?((solve_H T S G SOL))
+%    Where T is an integer representin which search to use
+%    T of 0 - 5 for hybrid, less than 0 for depth, greater 5 for breadth
+%    S is the starting node, G is the goal node, and SOL is the answer.
+((solve_H T S G SOL)
+  (kill goal)
+  (addcl ((goal G)))
+  (if (less T 0)
+    ((p 'T less than 0, running DF.')(solve_DF S G))
+    ((if (greater T 5)
+      ((p 'T greater than 5, running BF.')(solve_BF S G LL))
+      ((p 'In the middle, running hybrid.')(pp)(hyb_search T S G S1)(reverse S1 SOL)))
+    )
+  )
+  (pretty_print_solution SOL)
+  (delcl ((goal G)))
+)
+
+
+% Called by solve_H
+% Decides what search to use based on the depth of the current node when searching
+((hyb_search T ((X|Y) | PATHS) G (X|Y))
+  (goal X))
+  
+((hyb_search T S G SOL)
+  (depth S DEPTH)
+  (p "S: " S ", depth: " DEPTH)(pp)
+  (if (less DEPTH T)
+    ((if (pop S TEMP)
+      ((pp 'hyb depth')(hyb_depthF S S1)(hyb_search T S1 G SOL))
+      ((pp 'hyb depth')(hyb_depthF ((S)) S1)(hyb_search T S1 G SOL))
+    ))
+    ((if (pop S TEMP) %Gives 1st iteration of S parenthesis
+      ((pp 'hyb breadth')(hyb_breadthF S S1)(hyb_search T S1 G SOL))
+      ((pp 'hyb breadth')(hyb_breadthF ((S)) S1)(hyb_search T S1 G SOL))
+    ))
+  )
+)
+
+((hyb_breadthF (PAth | TPaths) NEWPATHS)
+  %Finds one step expansions
+  (expand PAth NPaths)
+  (append TPaths NPaths NEWPATHS)
+  (p "PAth: " PAth ", NPaths: " NPaths ", newpaths: " NEWPATHS)(pp)
+)
+
+((hyb_depthF LIST OUT)
+  (pop_last LIST LAST1)
+  (reverse LAST1 LAST1REV)
+  (pop_last LAST1REV LAST2)
+  (path LAST2 NEXT)
+  (append (NEXT) LAST1 OUT1)
+  (append LIST (OUT1) OUT)
+)
+
+((next_path LIST OUT)
+  (pop_last LIST LAST1)
+  (reverse LAST1 LAST1REV)
+  (pop_last LAST1REV LAST2)
+  (path LAST2 NEXT)
+  (append (NEXT) LAST1 OUT1)
+  (append () OUT1 OUT)
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+% === Breadth First Search ===
+% To call:
+%   ?((solve_BF S G2 SOL)(pp)(p SOL))
+%   Where S is the starting node, G is the goal node,
+%   and SOL is the outputted solution as a list.
+
+% Called by solve_BF
+% Recurring func, stops when path head is goal
+((breadthF ((X|T) | PATHS) (X|T))
+  (goalb X))
+
+((breadthF (PAth | TPaths) SOL)
+  %finds one step expansions
+  (expand PAth NPaths)
+
+  %appends the result: a list of partial paths
+  (append TPaths NPaths NEWPATHS)
+
+  %restarts with the new paths
+  (breadthF NEWPATHS SOL)
+)
+
+% Called in breadthF and hyb_breadthF
+% Expands list to find all one step expansions of current path
+((expand (HPath|TPath) NPaths)
+  (findall (NEXT HPath|TPath)
+    ((path HPath NEXT)(negg member NEXT (HPath|TPath)))NPaths
+  )
+)
+
+% Top level predicate of BF
+((solve_BF S G2 SOL)
+  (kill goalb)
+  (addcl ((goalb G2)))
+  (breadthF ((S)) S1)
+  (reverse S1 SOL)
+  (pp)(pp 'The solution is: ')
+  (pretty_print_solution SOL)
+  (delcl ((goalb G2)))
+)
+
+
+
+
+
+
+
+
+
+
+
+
+% === Depth First Search ===
+% To call:
+%   ?((solve_DF S G3))
+%   Where S is the starting node, and G3 is the goal node.
+
+
+% Called by depthF
+% Recursive function, ends when goal X is reached
+((go X (X) _ )
+  (goald X)
+)
+
+((go X (X|YPath) L)
+  (path X Y)
+  (go Y YPath (Y|L))
+)
+
+% Called by solve_DF
+((depthF S P L)
+  % Finishes when go completes recursion
+  (go S P L)
+  (pp)(pp 'The solution is: ')
+  (pretty_print_solution P)
+)
+
+((depthF S P L)
+  (print_end))
+
+% Top level predicate of DF
+((solve_DF S G3)
+  (kill goald)
+  (addcl ((goald G3)))
+  (depthF S P (S))
+  (delcl ((goald G3)))
+)
+
+
+
+
+
+% == Graph ==
+
+((connect s e 2)) 
+((connect e f 4)) 
+((connect f g 2)) 
+((connect g t 2)) 
+((connect t d 3)) 
+((connect d c 3)) 
+((connect c b 2)) 
+((connect b a 2)) 
+((connect a s 2)) 
+((path X Y C)(connect X Y C))   
+
+((goal t))
+
+((start s))
+
+% H is est cost from N to the goal t
+((h a 5)) 
+((h b 4)) 
+((h c 4)) 
+((h d 3)) 
+((h g 2)) 
+((h f 4)) 
+((h e 7)) 
+((h t 0))  
+
+((paths N NL P)
+ (isall  NL    X  (path N X _ )(negg member X P) )) 
+
+((new_paths () L PP () )) 
+((new_paths (NN |ON) L PP (((NN HV L1)|PP)|OP)) 
+            (sum L 1 L1) 
+            (heuristic NN L1 HV) 
+            (new_paths ON L PP OP))
+
+((move  ((N HV L)| T) NL) 
+                (paths N Y T) 
+                (new_paths Y L (N|T) NL))
+		
+((rem_dup () Y () Y)) 
+((rem_dup X () X () )) 
+((rem_dup (((X Y Z)|P)|ON)  (((X Y1 Z1)|P1) |ON1)  (((X Y Z)|P)|R) R1) 
+                    (less Z Z1) 
+                    (rem_dup ON ON1 R R1)) 
+((rem_dup (((X Y Z)|P)|ON)  (((X Y1 Z1)|P1) |ON1)   R (((X Y1 1Z)|P1)|R1) ) 
+                    (less Z1  Z) 
+                    (rem_dup ON ON1 R R1)) 
+((rem_dup (((X Y Z)|P)|ON)  (((X Y1 Z1)|P1) |ON1)  
+                   (((X Y Z)|P)|R)      (((X Y1 1Z)|P1)|R1) ) 
+                                                           (rem_dup ON ON1 R R1))
+
+((put_in_rest () Y Y)) 
+((put_in_rest (X|Y) Z L) 
+            (put_in_list X Z L1) 
+            (put_in_rest Y L1 L)) 
+
+(put_in_list  BRANCH     LISTBRANCHES     NEWLISTBRANCHES)
+
+((put_in_list Y () (Y))) 
+((put_in_list ((X Y Z)|R)  (((X1 Y1 Z1)|R1) |L)  (((X1 Y1 Z1)|R1)|NL) ) 
+                         (less Y1 Y) 
+                          (put_in_list ((X Y Z)|R) L NL))
+(((put_in_list ((X Y Z)|R)  (((X1 Y1 Z1)|R1) |L)  (((X Y Z)|R) (X1 Y1 Z1)|R1) | L) ) 
+                         (negg less Y1 Y))
+
+((go (((X HV L)|Y)|R)    (X|Y)  ) (goal X))  % goal is X 
+((go (X|Y) Z) 
+    (move X NL) 
+    (rem_dup NL Y NL1 Y1) 
+    (put_in_rest NL1 Y1 NP) 
+    (go NP Z)) 
+
+((h_search START GOAL PATH) 
+    (kill goal) 
+    (addcl ((goal G)) ) 
+    (go (((START 0 0))) P) 
+    (reverse P PATH) 
+    (pretty_print PATH) 
+    (delcl ((goal GOAL)) )) 
+
+
+
+
+
+
+
+
+
+
+
+
+% == Helper Functions ==
+
+
+((len () 0))
+((len (X|Y) C)(len Y C1)(sum C1 1 C))
+
+((pop_last (X) X))
+((pop_last (X|Y) Z) (pop_last Y Z) )
+
+((pop (X|Y))(Y))
+((pop (X|Y) Z) (append () Y Z))
+
+((path_exists FIRST LAST (X|Y) )
+  (if (first_member FIRST X)
+    ((if (last_member LAST X)
+      ((pp)(p "first:" FIRST ", last:"LAST ", "X " .")(pp)(eq 1 1))
+      ((eq 0 1))
+    ))
+    ((eq 0 1))
+  )
+)
+
+((depth LIST OUT)
+  (if (pop LIST TEMP)
+    ((pop_last LIST LAST) (len LAST OUT))
+    ((pop_last ((LIST)) LAST) (len LAST OUT))
+  )
+)
+
+((first_member X (Y|Z))
+  (eq X Y)
+)
+
+((last_member X (X)))
+((last_member X (Y|Z))
+  (last_member X Z)
+)
+
+((member X (X|Y) ))
+((member X (Y|Z))
+  (member X Z)
+)
+
+((greater X Y) (less Y X))
+
+((greater_eq X Y) (less_eq Y X))
+
+((member H (H|_)))
+((member X (H|T))
+  (member X T)
+)
+
+((print ())(p success))
+((print (H | T))
+  (p H ">>>")
+  (pp)(print T)
+)
+
+((print_end)
+  (pp 'No more solutions')
+)
+
+((reverse () ()))
+((reverse (H|T) R)(reverse T RT)(append RT (H) R))
+
+((append () L L))
+((append (H|T) L2 (H|L))(append T L2 L))
+
+((pretty_print_solution () ))
+((pretty_print_solution (H|T))
+  (p H '->')
+  (pretty_print_solution T)
+)

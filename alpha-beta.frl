@@ -1,0 +1,65 @@
+
+
+/* (alpha_beta P A B GP V) succeeds when GP is the successor in the alpha-beta pruning with alpha equal to A, beta equal to B and V is the corresponding minimax value.  It makes use of the auxiliary predicate decide.
+*/
+
+((alpha_beta P A B GP V )
+        (moves P PL)
+	(decide P A B GP V PL))
+
+/* decide when P is a leaf node: return its payoff value */
+((decide P _ _ _ V ())	
+	(staticvalue P V)(!))
+
+/* when not a leaf decide finds the best bounded value */
+
+((decide P A B GP V PL)
+	(bounded_best PL A B GP V))
+
+/* 
+((bounded_best L A B GP GV) finds the best node from the list L
+
+*/
+((bounded_best (P| PL) A B GP GV)
+	(alpha_beta P A B _ V)
+	(good_enough PL A B P V GP GV))
+
+
+((good_enough () _ _ P V P V)(!))
+
+((good_enough _ A B P V P V)
+	(min_to_move P)(less B V)(!))
+
+((good_enough _ A B P V P V)
+	(max_to_move P)(less V B)(!))
+
+((good_enough PL A B P V GP GV)
+	(new_bounds A B P V NA NB)
+	(bounded_best PL NA NB P1 V1)
+	(better_of P V P1 V1 GP GV))
+
+((new_bounds A B P V V B)
+	(min_to_move P)
+	(less A V)(!))
+
+((new_bounds A B P V A V)
+	(max_to_move P)
+	(less V B)(!))
+
+((new_bounds A B _ _ A B))
+
+((better_of P V P1 V1 P V)
+	(min_to_move P)(less V1 V)(!))
+
+((better_of P V P1 V1 P V)
+	(max_to_move P)(less V V1)(!))
+
+((better_of _ _ P1 V1 P1 V1))
+
+
+
+
+
+
+
+
